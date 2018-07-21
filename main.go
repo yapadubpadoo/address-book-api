@@ -46,14 +46,16 @@ func createAddress(w http.ResponseWriter, r *http.Request) {
 		body, _ := ioutil.ReadAll(r.Body)
 		contentType := r.Header.Get("Content-Type")
 		if contentType != "application/json" {
-			fmt.Println(contentType)
+			fmt.Println("Invalid content type", contentType)
 			responseError.Code = -1
 			responseError.Message = "Request body must be JSON"
 			fmt.Println(responseError)
 		} else {
 			fmt.Println("Going to decode JSON")
 			error := json.Unmarshal(body, &address)
-			responseError.Message = fmt.Sprintf("%+v", error)
+			if error != nill {
+				responseError.Message = fmt.Sprintf("%+v", error)
+			}
 			addressResponse.Data = append(addressResponse.Data, address)
 		}
 	default:
