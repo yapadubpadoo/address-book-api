@@ -44,13 +44,23 @@ func createAddress(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":
 		body, _ := ioutil.ReadAll(r.Body)
-		json.Unmarshal(body, &address)
-		addressResponse.Data = append(addressResponse.Data, address)
+		contentType := r.Header.Get("Content-Type")
+		if contentType != "application/json" {
+			fmt.Println(contentType)
+			responseError.Code = -1
+			responseError.Message = "Request body must be JSON"
+			fmt.Println(responseError)
+		} else {
+			fmt.Println("Going to decode JSON")
+			error := json.Unmarshal(body, &address)
+			responseError.Message = fmt.Sprintf("%+v", error)
+			addressResponse.Data = append(addressResponse.Data, address)
+		}
 	default:
 		responseError.Code = 403
 		responseError.Message = fmt.Sprintf("%s is not allowed on this endpoint", r.Method)
-		addressResponse.Error = responseError
 	}
+	addressResponse.Error = responseError
 	handleResponse(w, addressResponse)
 }
 
