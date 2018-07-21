@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -37,14 +38,14 @@ func handleResponse(w http.ResponseWriter, adr AddressResponse) {
 }
 
 func createAddress(w http.ResponseWriter, r *http.Request) {
-	// address := Address{}
-	// json.Unmarshal(body, &address)
-
+	address := Address{}
 	responseError := Error{}
 	addressResponse := AddressResponse{}
 	switch r.Method {
 	case "POST":
-		fmt.Fprint(w, r.Body)
+		body, _ := ioutil.ReadAll(r.Body)
+		json.Unmarshal(body, &address)
+		addressResponse.Data = append(addressResponse.Data, address)
 	default:
 		responseError.Code = 403
 		responseError.Message = fmt.Sprintf("%s is not allowed on this endpoint", r.Method)
