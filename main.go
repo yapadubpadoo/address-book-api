@@ -91,6 +91,17 @@ func getDBSession() *mgo.Session {
 	return session
 }
 
+func getAdress(w http.ResponseWriter, r *http.Request) {
+	url_parameter := r.URL.Query()
+	fmt.Println(url_parameter)
+	address := Address{}
+	address.Name = fmt.Sprintf("Name of %s", url_parameter["id"][0])
+	address.Phone = fmt.Sprintf("Phone of %s", url_parameter["id"][0])
+	addressResponse := AddressResponse{}
+	addressResponse.Data = append(addressResponse.Data, address)
+	handleResponse(w, addressResponse)
+}
+
 func main() {
 	http.HandleFunc("/", index)
 	http.HandleFunc("/healthcheck", healthcheck)
@@ -107,6 +118,8 @@ func main() {
 	// http.HandleFunc("/record/:id", healthcheck)
 
 	// http.HandleFunc("/record/:id", healthcheck)
+
+	http.HandleFunc("/get-address", getAdress)
 
 	http.ListenAndServe(":8080", nil)
 }
